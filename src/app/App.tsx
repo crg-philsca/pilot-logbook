@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { LogbookDashboard, FlightEntry } from './components/LogbookDashboard';
 import { AddFlightScreen } from './components/AddFlightScreen';
 import { FlightDetailsScreen } from './components/FlightDetailsScreen';
@@ -13,62 +13,80 @@ type Screen = 'logbook' | 'add' | 'details' | 'stats' | 'profile';
 export default function App() {
   const [currentScreen, setCurrentScreen] = useState<Screen>('logbook');
   const [activeTab, setActiveTab] = useState('logbook');
-  const [flights, setFlights] = useState<FlightEntry[]>([
-    {
-      id: '1',
-      date: '2026-02-08',
-      departure: 'KJFK',
-      arrival: 'KLAX',
-      aircraft: 'B737',
-      flightTime: 5.5,
-      notes: 'Clear skies, smooth flight. Perfect weather conditions throughout.'
-    },
-    {
-      id: '2',
-      date: '2026-02-06',
-      departure: 'KSFO',
-      arrival: 'KORD',
-      aircraft: 'A320',
-      flightTime: 4.2,
-      notes: 'Minor turbulence over the Rockies.'
-    },
-    {
-      id: '3',
-      date: '2026-02-03',
-      departure: 'KMIA',
-      arrival: 'KATL',
-      aircraft: 'B737',
-      flightTime: 1.8,
-      notes: ''
-    },
-    {
-      id: '4',
-      date: '2026-01-28',
-      departure: 'KBOS',
-      arrival: 'KDFW',
-      aircraft: 'A320',
-      flightTime: 3.7,
-      notes: 'Good passenger load, on-time departure and arrival.'
-    },
-    {
-      id: '5',
-      date: '2026-01-25',
-      departure: 'KSEA',
-      arrival: 'KPHX',
-      aircraft: 'B737',
-      flightTime: 2.9,
-      notes: ''
-    },
-    {
-      id: '6',
-      date: '2026-01-20',
-      departure: 'KLAS',
-      arrival: 'KJFK',
-      aircraft: 'B787',
-      flightTime: 5.1,
-      notes: 'Red-eye flight, minimal traffic. Excellent fuel efficiency.'
+
+  // Initialize flights from localStorage if available
+  const [flights, setFlights] = useState<FlightEntry[]>(() => {
+    const savedFlights = localStorage.getItem('pilot_flights');
+    if (savedFlights) {
+      try {
+        return JSON.parse(savedFlights);
+      } catch (e) {
+        console.error('Failed to parse saved flights', e);
+      }
     }
-  ]);
+    return [
+      {
+        id: '1',
+        date: '2026-02-08',
+        departure: 'KJFK',
+        arrival: 'KLAX',
+        aircraft: 'B737',
+        flightTime: 5.5,
+        notes: 'Clear skies, smooth flight. Perfect weather conditions throughout.'
+      },
+      {
+        id: '2',
+        date: '2026-02-06',
+        departure: 'KSFO',
+        arrival: 'KORD',
+        aircraft: 'A320',
+        flightTime: 4.2,
+        notes: 'Minor turbulence over the Rockies.'
+      },
+      {
+        id: '3',
+        date: '2026-02-03',
+        departure: 'KMIA',
+        arrival: 'KATL',
+        aircraft: 'B737',
+        flightTime: 1.8,
+        notes: ''
+      },
+      {
+        id: '4',
+        date: '2026-01-28',
+        departure: 'KBOS',
+        arrival: 'KDFW',
+        aircraft: 'A320',
+        flightTime: 3.7,
+        notes: 'Good passenger load, on-time departure and arrival.'
+      },
+      {
+        id: '5',
+        date: '2026-01-25',
+        departure: 'KSEA',
+        arrival: 'KPHX',
+        aircraft: 'B737',
+        flightTime: 2.9,
+        notes: ''
+      },
+      {
+        id: '6',
+        date: '2026-01-20',
+        departure: 'KLAS',
+        arrival: 'KJFK',
+        aircraft: 'B787',
+        flightTime: 5.1,
+        notes: 'Red-eye flight, minimal traffic. Excellent fuel efficiency.'
+      }
+    ];
+  });
+
+  // Save to localStorage whenever flights change
+  useEffect(() => {
+    localStorage.setItem('pilot_flights', JSON.stringify(flights));
+  }, [flights]);
+
   const [selectedFlight, setSelectedFlight] = useState<FlightEntry | null>(null);
   const [editingFlight, setEditingFlight] = useState<FlightEntry | undefined>(undefined);
 
@@ -87,8 +105,8 @@ export default function App() {
   const handleSaveFlight = (flightData: Omit<FlightEntry, 'id'>) => {
     if (editingFlight) {
       // Update existing flight
-      setFlights(flights.map(f => 
-        f.id === editingFlight.id 
+      setFlights(flights.map(f =>
+        f.id === editingFlight.id
           ? { ...flightData, id: editingFlight.id }
           : f
       ));
