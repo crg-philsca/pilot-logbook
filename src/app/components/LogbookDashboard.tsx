@@ -53,8 +53,18 @@ export function LogbookDashboard({ flights, onFlightClick, onAddFlight, totalHou
 
   return (
     <div className="flex flex-col h-full bg-gradient-to-b from-blue-50 to-white">
+      {/* Update Available Banner - Shows only when new version is ready */}
+      {isRefreshing && (
+        <div className="bg-blue-600 text-white px-4 py-3 text-sm font-medium flex justify-between items-center animate-in slide-in-from-top-2">
+          <span className="flex items-center gap-2">
+            <RefreshCw className="h-4 w-4 animate-spin" />
+            Updating flight deck...
+          </span>
+        </div>
+      )}
+
       {/* Header with Summary Stats */}
-      <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 pt-8 pb-6 shadow-lg">
+      <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 pt-8 pb-6 shadow-lg z-10 sticky top-0">
         <div className="flex items-center justify-between mb-6">
           <div>
             <h1 className="text-2xl font-bold mb-1 tracking-tight">Logbook</h1>
