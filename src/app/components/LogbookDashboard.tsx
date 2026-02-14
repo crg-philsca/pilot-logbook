@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Plus, Search, Plane, Clock, MapPin, Calendar as CalendarIcon } from 'lucide-react';
+import { Plus, Search, Plane, Clock, MapPin, Calendar as CalendarIcon, RefreshCw } from 'lucide-react';
 import { Card, CardContent } from './ui/card';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
@@ -25,6 +25,14 @@ interface LogbookDashboardProps {
 
 export function LogbookDashboard({ flights, onFlightClick, onAddFlight, totalHours }: LogbookDashboardProps) {
   const [searchQuery, setSearchQuery] = useState('');
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const handleRefresh = () => {
+    setIsRefreshing(true);
+    setTimeout(() => {
+      window.location.reload();
+    }, 500);
+  };
 
   const filteredFlights = flights.filter(flight =>
     flight.departure.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -49,12 +57,21 @@ export function LogbookDashboard({ flights, onFlightClick, onAddFlight, totalHou
       <div className="bg-gradient-to-r from-blue-600 to-blue-700 text-white px-6 pt-8 pb-6 shadow-lg">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl mb-1">Pilot Logbook</h1>
-            <p className="text-blue-100 text-sm">Track your flight hours</p>
+            <h1 className="text-2xl font-bold mb-1 tracking-tight">Logbook</h1>
+            <p className="text-blue-100/80 text-sm font-medium">Flight Deck</p>
           </div>
-          <div className="bg-white/20 backdrop-blur-sm rounded-2xl px-5 py-3 text-center">
-            <div className="text-3xl mb-1">{totalHours.toFixed(1)}</div>
-            <div className="text-xs text-blue-100">Total Hours</div>
+          <div className="flex items-center gap-3">
+            <button
+              onClick={handleRefresh}
+              className="p-2 rounded-full bg-white/10 hover:bg-white/20 active:scale-95 transition-all text-white/80"
+              aria-label="Refresh App"
+            >
+              <RefreshCw className={`h-5 w-5 ${isRefreshing ? 'animate-spin' : ''}`} />
+            </button>
+            <div className="bg-white/20 backdrop-blur-md rounded-2xl px-4 py-2 text-center border border-white/10">
+              <div className="text-2xl font-bold tracking-tight">{totalHours.toFixed(1)}</div>
+              <div className="text-[10px] uppercase tracking-wider text-blue-100 font-semibold">Hours</div>
+            </div>
           </div>
         </div>
 
@@ -103,31 +120,44 @@ export function LogbookDashboard({ flights, onFlightClick, onAddFlight, totalHou
                 tabIndex={0}
                 aria-label={`Flight from ${flight.departure} to ${flight.arrival}`}
               >
-                <CardContent className="p-5">
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="flex-1">
-                      <div className="flex items-center gap-2 mb-2">
-                        <MapPin className="h-4 w-4 text-blue-600 flex-shrink-0" />
-                        <span className="text-lg">
-                          {flight.departure} → {flight.arrival}
-                        </span>
-                      </div>
-                      <div className="flex items-center gap-4 text-sm text-gray-600">
-                        <div className="flex items-center gap-1.5">
-                          <CalendarIcon className="h-4 w-4" />
+                <CardContent className="p-0">
+                  <div className="flex flex-col">
+                    {/* Upper Part: Route & Time */}
+                    <div className="p-5 flex justify-between items-center border-b border-gray-100">
+                      <div className="flex flex-col items-start min-w-0 flex-1 mr-4">
+                        <div className="flex items-center gap-2 text-gray-500 text-xs uppercase tracking-wider font-semibold mb-1">
+                          <CalendarIcon className="h-3 w-3" />
                           <span>{formatDate(flight.date)}</span>
                         </div>
-                        <div className="flex items-center gap-1.5">
-                          <Clock className="h-4 w-4" />
-                          <span>{formatTime(flight.flightTime)}</span>
+                        <div className="flex items-center gap-3 w-full">
+                          <span className="text-xl font-bold text-gray-900 truncate max-w-[40%] text-right">{flight.departure}</span>
+                          <Plane className="h-4 w-4 text-blue-400 rotate-90 flex-shrink-0" />
+                          <span className="text-xl font-bold text-gray-900 truncate max-w-[40%]">{flight.arrival}</span>
                         </div>
                       </div>
+
+                      <div className="flex flex-col items-end pl-4 border-l border-gray-100">
+                        <span className="text-2xl font-black text-blue-600 tracking-tight leading-none">
+                          {formatTime(flight.flightTime).split(' ')[0]}
+                        </span>
+                        <span className="text-xs text-gray-400 font-medium lowercase">
+                          {formatTime(flight.flightTime).split(' ')[1]}
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <Badge variant="secondary" className="bg-blue-100 text-blue-700 hover:bg-blue-100 px-3 py-1">
-                      {flight.aircraft}
-                    </Badge>
+
+                    {/* Lower Part: Details */}
+                    <div className="px-5 py-3 bg-gray-50/50 flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <Badge variant="outline" className="border-blue-200 text-blue-700 bg-blue-50">
+                          {flight.aircraft}
+                        </Badge>
+                      </div>
+                      <div className="flex items-center text-gray-400">
+                        <Clock className="h-3 w-3 mr-1" />
+                        <span className="text-xs font-medium">Total Time</span>
+                      </div>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
@@ -137,15 +167,7 @@ export function LogbookDashboard({ flights, onFlightClick, onAddFlight, totalHou
       </div>
 
       {/* Floating Add Button */}
-      <div className="fixed bottom-24 right-6 z-10 flex flex-col items-center gap-2">
-        <Button
-          onClick={() => window.location.reload()}
-          size="sm"
-          variant="ghost"
-          className="text-xs text-blue-400 hover:text-blue-600 bg-white/80 backdrop-blur-sm shadow-sm rounded-full px-3 py-1"
-        >
-          Update App
-        </Button>
+      <div className="fixed bottom-24 right-6 z-10">
         <Button
           onClick={onAddFlight}
           size="lg"

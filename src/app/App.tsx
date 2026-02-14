@@ -155,7 +155,7 @@ export default function App() {
   };
 
   return (
-    <div className="h-screen w-full max-w-[480px] mx-auto bg-white overflow-hidden flex flex-col">
+    <div className="h-screen w-full max-w-[480px] mx-auto bg-white overflow-hidden flex flex-col relative shadow-2xl">
       {/* Main Content Area */}
       <div className="flex-1 overflow-hidden">
         {currentScreen === 'logbook' && (
