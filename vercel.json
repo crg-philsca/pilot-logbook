@@ -1,5 +1,4 @@
 {
-    "name": "pilot-logbook-v2",
     "version": 2,
     "builds": [
         {
@@ -8,6 +7,9 @@
         }
     ],
     "routes": [
+        {
+            "handle": "filesystem"
+        },
         {
             "src": "/(.*)",
             "dest": "/index.html"
