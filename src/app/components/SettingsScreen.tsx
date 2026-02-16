@@ -100,19 +100,19 @@ export function SettingsScreen({ onBack, onClearData, currentTheme, onThemeChang
                 {/* Data Management */}
                 <section>
                     <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest px-1 mb-3">Data Management</h3>
-                    <Card className="bg-slate-800/50 backdrop-blur-md border border-slate-700 shadow-xl overflow-hidden">
+                    <Card className="bg-white dark:bg-slate-800/50 backdrop-blur-md border border-slate-200 dark:border-slate-700 shadow-xl overflow-hidden transition-colors">
                         <CardContent className="p-0">
                             <div
                                 onClick={onClearData}
-                                className="flex items-center justify-between p-4 hover:bg-red-500/10 transition-colors cursor-pointer group active:bg-red-500/20"
+                                className="flex items-center justify-between p-4 hover:bg-red-50 dark:hover:bg-red-500/10 transition-colors cursor-pointer group active:bg-red-100 dark:active:bg-red-500/20"
                             >
                                 <div className="flex items-center gap-3">
-                                    <div className="bg-red-500/10 p-2 rounded-lg text-red-400 group-hover:text-red-300 transition-colors border border-red-500/20">
+                                    <div className="bg-red-100 dark:bg-red-500/10 p-2 rounded-lg text-red-600 dark:text-red-400 group-hover:text-red-700 dark:group-hover:text-red-300 transition-colors border border-red-200 dark:border-red-500/20">
                                         <Trash2 className="h-5 w-5" />
                                     </div>
                                     <div>
-                                        <span className="text-red-400 font-medium block">Clear All Flight Data</span>
-                                        <span className="text-slate-500 text-xs">Permanently delete all logs</span>
+                                        <span className="text-red-600 dark:text-red-400 font-medium block transition-colors">Clear All Flight Data</span>
+                                        <span className="text-slate-500 text-xs transition-colors">Permanently delete all logs</span>
                                     </div>
                                 </div>
                             </div>
@@ -123,33 +123,33 @@ export function SettingsScreen({ onBack, onClearData, currentTheme, onThemeChang
                 {/* Troubleshooting */}
                 <section>
                     <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest px-1 mb-3">Troubleshooting</h3>
-                    <Card className="bg-slate-800/50 backdrop-blur-md border border-slate-700 shadow-xl overflow-hidden">
+                    <Card className="bg-white dark:bg-slate-800/50 backdrop-blur-md border border-slate-200 dark:border-slate-700 shadow-xl overflow-hidden transition-colors">
                         <CardContent className="p-0">
                             <div
                                 onClick={handleRefresh}
-                                className="flex items-center justify-between p-4 hover:bg-orange-500/10 transition-colors cursor-pointer group active:bg-orange-500/20"
+                                className="flex items-center justify-between p-4 hover:bg-orange-50 dark:hover:bg-orange-500/10 transition-colors cursor-pointer group active:bg-orange-100 dark:active:bg-orange-500/20"
                             >
                                 <div className="flex items-center gap-3">
-                                    <div className="bg-orange-500/10 p-2 rounded-lg text-orange-400 group-hover:text-orange-300 transition-colors border border-orange-500/20">
+                                    <div className="bg-orange-100 dark:bg-orange-500/10 p-2 rounded-lg text-orange-600 dark:text-orange-400 group-hover:text-orange-700 dark:group-hover:text-orange-300 transition-colors border border-orange-200 dark:border-orange-500/20">
                                         <RefreshCw className="h-5 w-5" />
                                     </div>
                                     <div>
-                                        <span className="text-orange-400 font-medium block">Hard Reset App</span>
-                                        <span className="text-slate-500 text-xs">Fix "Nothing Changed" issues</span>
+                                        <span className="text-orange-600 dark:text-orange-400 font-medium block transition-colors">Hard Reset App</span>
+                                        <span className="text-slate-500 text-xs transition-colors">Fix "Nothing Changed" issues</span>
                                     </div>
                                 </div>
                             </div>
                         </CardContent>
                     </Card>
-                    <p className="text-[10px] text-slate-600 mt-2 px-2">
+                    <p className="text-[10px] text-slate-500 dark:text-slate-600 mt-2 px-2 transition-colors">
                         Use Hard Reset if the app isn't updating or features are missing. This will force a fresh download of the latest version.
                     </p>
                 </section>
 
                 <div className="text-center pt-8 pb-4">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800 border border-slate-700">
-                        <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></div>
-                        <span className="text-[10px] text-slate-400 uppercase tracking-widest font-mono">System Online v4.0.0</span>
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 transition-colors">
+                        <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+                        <span className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-widest font-mono transition-colors">System Online v4.1.0</span>
                     </div>
                 </div>
 
