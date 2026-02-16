@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { Plus, Search, Plane, Clock, MapPin, Calendar as CalendarIcon, RefreshCw } from 'lucide-react';
+import { Plus, Search, Plane, Clock, MapPin, Calendar as CalendarIcon, RefreshCw, Filter, X } from 'lucide-react';
 import { Card, CardContent } from './ui/card';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 
 export interface FlightEntry {
   id: string;
@@ -26,6 +26,8 @@ interface LogbookDashboardProps {
 export function LogbookDashboard({ flights, onFlightClick, onAddFlight, totalHours }: LogbookDashboardProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [showFilter, setShowFilter] = useState(false);
+  const [dateFilter, setDateFilter] = useState('');
 
   const handleRefresh = () => {
     setIsRefreshing(true);
@@ -34,11 +36,15 @@ export function LogbookDashboard({ flights, onFlightClick, onAddFlight, totalHou
     }, 500);
   };
 
-  const filteredFlights = flights.filter(flight =>
-    flight.departure.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    flight.arrival.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    flight.aircraft.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredFlights = flights.filter(flight => {
+    const matchesSearch = flight.departure.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      flight.arrival.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      flight.aircraft.toLowerCase().includes(searchQuery.toLowerCase());
+
+    const matchesDate = dateFilter ? flight.date === dateFilter : true;
+
+    return matchesSearch && matchesDate;
+  });
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
@@ -86,17 +92,65 @@ export function LogbookDashboard({ flights, onFlightClick, onAddFlight, totalHou
           </div>
         </div>
 
-        {/* Search Bar - Integrated */}
-        <div className="relative group">
-          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 h-5 w-5 group-focus-within:text-blue-400 transition-colors" />
-          <Input
-            type="text"
-            placeholder="Search logs..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-12 pr-4 h-12 rounded-xl border-0 bg-slate-800/50 text-white placeholder:text-slate-500 focus:bg-slate-800 focus:ring-2 focus:ring-blue-500 transition-all font-medium"
-            aria-label="Search flights"
-          />
+        {/* Search Bar & Filter - Integrated */}
+        <div className="space-y-3">
+          <div className="flex gap-3">
+            <div className="relative flex-1 group">
+              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 h-5 w-5 group-focus-within:text-blue-400 transition-colors" />
+              <Input
+                type="text"
+                placeholder="Search logs..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-12 pr-4 h-12 rounded-xl border-0 bg-slate-800/50 text-white placeholder:text-slate-500 focus:bg-slate-800 focus:ring-2 focus:ring-blue-500 transition-all font-medium"
+                aria-label="Search flights"
+              />
+            </div>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={() => setShowFilter(!showFilter)}
+              className={`h-12 w-12 rounded-xl border-slate-700 bg-slate-800/50 hover:bg-slate-700 hover:text-white transition-all ${dateFilter || showFilter ? 'text-blue-400 border-blue-500/30 bg-blue-500/10' : 'text-slate-400'}`}
+            >
+              <Filter className="h-5 w-5" />
+            </Button>
+          </div>
+
+          <AnimatePresence>
+            {showFilter && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                className="overflow-hidden"
+              >
+                <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="flex items-center gap-2">
+                      <CalendarIcon className="h-4 w-4 text-blue-400" />
+                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Filter by Date</span>
+                    </div>
+                    {dateFilter && (
+                      <button
+                        onClick={() => setDateFilter('')}
+                        className="text-[10px] text-red-400 font-bold uppercase tracking-wider hover:text-red-300"
+                      >
+                        Clear
+                      </button>
+                    )}
+                  </div>
+                  <div className="flex gap-2">
+                    <Input
+                      type="date"
+                      value={dateFilter}
+                      onChange={(e) => setDateFilter(e.target.value)}
+                      className="bg-slate-900 border-slate-600 text-white h-10 font-mono"
+                    />
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
 
