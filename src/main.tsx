@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom/client';
 import App from './app/App.tsx';
 import './styles/index.css';
 
-const APP_VERSION = '4.0.0';
+const APP_VERSION = '4.1.0';
 
 // Nuclear Cache Clearing & Version Check
 const currentVersion = localStorage.getItem('app_version');

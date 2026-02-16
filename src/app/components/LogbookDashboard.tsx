@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Plus, Search, Plane, Clock, MapPin, Calendar as CalendarIcon, RefreshCw, Filter, X } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
+import { Plus, Search, Plane, Clock, MapPin, Calendar as CalendarIcon, RefreshCw, Filter, X, ChevronDown } from 'lucide-react';
 import { Card, CardContent } from './ui/card';
 import { Input } from './ui/input';
 import { Button } from './ui/button';
@@ -27,7 +27,22 @@ export function LogbookDashboard({ flights, onFlightClick, onAddFlight, totalHou
   const [searchQuery, setSearchQuery] = useState('');
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [showFilter, setShowFilter] = useState(false);
-  const [dateFilter, setDateFilter] = useState('');
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+  const filterRef = useRef<HTMLDivElement>(null);
+
+  // Close filter when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (filterRef.current && !filterRef.current.contains(event.target as Node)) {
+        setShowFilter(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [filterRef]);
 
   const handleRefresh = () => {
     setIsRefreshing(true);
@@ -41,111 +56,105 @@ export function LogbookDashboard({ flights, onFlightClick, onAddFlight, totalHou
       flight.arrival.toLowerCase().includes(searchQuery.toLowerCase()) ||
       flight.aircraft.toLowerCase().includes(searchQuery.toLowerCase());
 
-    const matchesDate = dateFilter ? flight.date === dateFilter : true;
+    let matchesDate = true;
+    if (startDate && endDate) {
+      matchesDate = flight.date >= startDate && flight.date <= endDate;
+    } else if (startDate) {
+      matchesDate = flight.date >= startDate;
+    } else if (endDate) {
+      matchesDate = flight.date <= endDate;
+    }
 
     return matchesSearch && matchesDate;
   });
 
   const formatDate = (dateStr: string) => {
     const date = new Date(dateStr);
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }).toUpperCase();
   };
 
   const formatTime = (hours: number) => {
     const h = Math.floor(hours);
     const m = Math.round((hours - h) * 60);
-    return `${h}h ${m}m`;
+    return `${h}H ${m}M`;
   };
 
   return (
-    <div className="flex flex-col h-full bg-gradient-to-b from-blue-50 to-white">
-      {/* Update Available Banner - Shows only when new version is ready */}
+    <div className="flex flex-col h-full bg-slate-950 relative">
+      {/* Update Available Banner */}
       {isRefreshing && (
-        <div className="bg-blue-600 text-white px-4 py-3 text-sm font-medium flex justify-between items-center animate-in slide-in-from-top-2">
+        <div className="bg-blue-600 text-white px-4 py-3 text-sm font-medium flex justify-between items-center animate-in slide-in-from-top-2 absolute top-0 left-0 right-0 z-50">
           <span className="flex items-center gap-2">
             <RefreshCw className="h-4 w-4 animate-spin" />
-            Updating flight deck...
+            Updating cockpit systems...
           </span>
         </div>
       )}
 
       {/* Header with Cockpit Design */}
-      <div className="bg-slate-900 text-white px-6 pt-12 pb-8 shadow-2xl z-10 sticky top-0 border-b border-slate-800">
-        <div className="flex items-center justify-between mb-8">
+      <div className="bg-slate-900 border-b border-slate-800 px-6 pt-14 pb-6 shadow-2xl z-20 sticky top-0">
+        <div className="flex items-center justify-between mb-6">
           <div>
-            <div className="text-[10px] text-blue-400 font-bold tracking-[0.2em] uppercase mb-1">Flight Deck</div>
-            <h1 className="text-3xl font-black tracking-tight text-white">LOGBOOK</h1>
+            <div className="text-[10px] text-blue-500 font-bold tracking-[0.2em] uppercase mb-1 drop-shadow-lg">Flight Deck</div>
+            <h1 className="text-3xl font-black tracking-tight text-white drop-shadow-md">LOGBOOK</h1>
           </div>
 
-          <div className="flex items-center gap-4">
-            <button
-              onClick={handleRefresh}
-              className="p-3 rounded-full bg-slate-800 hover:bg-slate-700 active:scale-95 transition-all text-blue-400 border border-slate-700 shadow-inner"
-              aria-label="Refresh App"
-            >
-              <RefreshCw className={`h-5 w-5 ${isRefreshing ? 'animate-spin' : ''}`} />
-            </button>
-            <div className="bg-slate-800/80 backdrop-blur-md rounded-xl px-4 py-2 text-right border border-slate-700 shadow-lg min-w-[100px]">
-              <div className="text-3xl font-mono font-bold text-white tracking-tighter leading-none">{totalHours.toFixed(1)}</div>
-              <div className="text-[9px] uppercase tracking-widest text-slate-400 mt-1 font-semibold">Total Hours</div>
+          <div className="flex items-center gap-3">
+            {/* Total Hours Badge */}
+            <div className="bg-slate-800/80 backdrop-blur-md rounded-xl px-4 py-2 text-right border border-slate-700/50 shadow-lg min-w-[90px] relative overflow-hidden group">
+              <div className="absolute inset-0 bg-blue-500/5 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              <div className="text-2xl font-mono font-bold text-white tracking-tighter leading-none">{totalHours.toFixed(1)}</div>
+              <div className="text-[8px] uppercase tracking-widest text-slate-400 mt-1 font-bold">Hours</div>
             </div>
           </div>
         </div>
 
-        {/* Search Bar & Filter - Integrated */}
-        <div className="space-y-3">
-          <div className="flex gap-3">
-            <div className="relative flex-1 group">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 h-5 w-5 group-focus-within:text-blue-400 transition-colors" />
-              <Input
-                type="text"
-                placeholder="Search logs..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-12 pr-4 h-12 rounded-xl border-0 bg-slate-800/50 text-white placeholder:text-slate-500 focus:bg-slate-800 focus:ring-2 focus:ring-blue-500 transition-all font-medium"
-                aria-label="Search flights"
-              />
-            </div>
-            <Button
-              variant="outline"
-              size="icon"
-              onClick={() => setShowFilter(!showFilter)}
-              className={`h-12 w-12 rounded-xl border-slate-700 bg-slate-800/50 hover:bg-slate-700 hover:text-white transition-all ${dateFilter || showFilter ? 'text-blue-400 border-blue-500/30 bg-blue-500/10' : 'text-slate-400'}`}
-            >
-              <Filter className="h-5 w-5" />
-            </Button>
+        {/* Search Bar & Filter */}
+        <div className="flex gap-3 relative" ref={filterRef}>
+          <div className="relative flex-1 group">
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-500 h-5 w-5 group-focus-within:text-blue-400 transition-colors" />
+            <Input
+              type="text"
+              placeholder="Search logs..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-12 pr-4 h-12 rounded-xl border-slate-700 bg-slate-800 text-white placeholder:text-slate-500 focus:bg-slate-800 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all font-medium"
+            />
           </div>
 
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={() => setShowFilter(!showFilter)}
+            className={`h-12 w-12 rounded-xl border-slate-700 bg-slate-800 hover:bg-slate-700 hover:text-white transition-all ${showFilter || startDate || endDate ? 'border-blue-500 text-blue-400' : 'text-slate-400'}`}
+          >
+            <Filter className="h-5 w-5" />
+          </Button>
+
+          {/* Dropdown Filter */}
           <AnimatePresence>
             {showFilter && (
               <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                className="overflow-hidden"
+                initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                transition={{ duration: 0.2 }}
+                className="absolute top-14 right-0 w-72 bg-slate-800 border border-slate-700 rounded-xl shadow-2xl p-4 z-50"
               >
-                <div className="bg-slate-800/50 rounded-xl p-4 border border-slate-700">
-                  <div className="flex items-center justify-between mb-2">
-                    <div className="flex items-center gap-2">
-                      <CalendarIcon className="h-4 w-4 text-blue-400" />
-                      <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Filter by Date</span>
-                    </div>
-                    {dateFilter && (
-                      <button
-                        onClick={() => setDateFilter('')}
-                        className="text-[10px] text-red-400 font-bold uppercase tracking-wider hover:text-red-300"
-                      >
-                        Clear
-                      </button>
-                    )}
+                <div className="flex justify-between items-center mb-4">
+                  <span className="text-xs font-bold text-slate-400 uppercase tracking-widest">Filter Date Range</span>
+                  {(startDate || endDate) && (
+                    <button onClick={() => { setStartDate(''); setEndDate(''); }} className="text-[10px] text-red-400 hover:text-red-300 font-bold uppercase">Clear</button>
+                  )}
+                </div>
+                <div className="space-y-3">
+                  <div>
+                    <label className="text-[10px] text-slate-500 uppercase font-bold mb-1 block">Start Date</label>
+                    <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="bg-slate-900 border-slate-600 text-white h-9 text-xs" />
                   </div>
-                  <div className="flex gap-2">
-                    <Input
-                      type="date"
-                      value={dateFilter}
-                      onChange={(e) => setDateFilter(e.target.value)}
-                      className="bg-slate-900 border-slate-600 text-white h-10 font-mono"
-                    />
+                  <div>
+                    <label className="text-[10px] text-slate-500 uppercase font-bold mb-1 block">End Date</label>
+                    <Input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="bg-slate-900 border-slate-600 text-white h-9 text-xs" />
                   </div>
                 </div>
               </motion.div>
@@ -154,70 +163,69 @@ export function LogbookDashboard({ flights, onFlightClick, onAddFlight, totalHou
         </div>
       </div>
 
-      {/* Flight List - Ticket Style */}
-      <div className="flex-1 overflow-y-auto px-4 py-6 space-y-4 pb-32 bg-slate-50">
+      {/* Flight List */}
+      <div className="flex-1 overflow-y-auto px-4 py-6 space-y-4 pb-32 bg-slate-950/50">
         {filteredFlights.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center px-6 opacity-60">
-            <Plane className="h-16 w-16 text-slate-300 mb-4" />
-            <h3 className="text-lg font-bold text-slate-400">NO FLIGHTS FOUND</h3>
+            <Plane className="h-16 w-16 text-slate-700 mb-4" />
+            <h3 className="text-lg font-bold text-slate-500">NO FLIGHTS RECORDED</h3>
           </div>
         ) : (
           filteredFlights.map((flight) => (
             <motion.div
               key={flight.id}
-              initial={{ opacity: 0, scale: 0.98 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.2 }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
             >
               <Card
-                className="cursor-pointer group hover:shadow-xl transition-all duration-300 border-0 shadow-sm bg-white overflow-hidden relative"
+                className="cursor-pointer group hover:border-blue-500/50 transition-all duration-300 border border-slate-800 bg-slate-900/50 backdrop-blur-sm overflow-hidden relative shadow-lg"
                 onClick={() => onFlightClick(flight)}
-                role="button"
-                tabIndex={0}
               >
-                {/* Decorative Side Bar */}
-                <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-blue-600 group-hover:bg-blue-500 transition-colors"></div>
-
-                <div className="flex flex-col relative w-full">
-                  {/* Ticket Header: Date & Aircraft */}
-                  <div className="flex justify-between items-center px-5 py-3 bg-slate-50 border-b border-dashed border-slate-200">
-                    <div className="flex items-center gap-2">
-                      <div className="h-2 w-2 rounded-full bg-slate-300 group-hover:bg-blue-400 transition-colors"></div>
-                      <span className="text-xs font-bold text-slate-500 tracking-wide uppercase font-mono">{formatDate(flight.date)}</span>
-                    </div>
-                    <Badge variant="outline" className="border-slate-200 text-slate-600 font-mono text-xs bg-white px-2 py-0.5 shadow-sm">
-                      {flight.aircraft}
-                    </Badge>
+                {/* Top Bar: Date & ID */}
+                <div className="flex justify-between items-center px-5 py-3 border-b border-slate-800/50 bg-slate-900/30">
+                  <div className="flex items-center gap-2">
+                    <CalendarIcon className="h-3 w-3 text-blue-500" />
+                    <span className="text-[10px] font-bold text-slate-400 tracking-widest uppercase">{formatDate(flight.date)}</span>
                   </div>
+                  <Badge variant="outline" className="border-slate-700 text-slate-400 text-[10px] font-mono bg-slate-800/50 px-2 py-0.5">
+                    {flight.aircraft}
+                  </Badge>
+                </div>
 
-                  {/* Ticket Body: Route */}
-                  <div className="px-5 py-5 flex justify-between items-center">
-                    <div className="text-left">
-                      <span className="block text-4xl font-black text-slate-800 tracking-tighter">{flight.departure}</span>
-                      <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Depart</span>
+                {/* Main Content: Route Visualization */}
+                <div className="px-5 py-6">
+                  <div className="flex items-center justify-between">
+                    {/* Departure */}
+                    <div className="text-left w-24">
+                      <span className="block text-3xl font-black text-white tracking-widest font-mono">{flight.departure}</span>
+                      <span className="text-[9px] uppercase font-bold text-slate-500 tracking-wider mt-1 block">Departure</span>
                     </div>
 
-                    <div className="flex-1 px-6 flex flex-col items-center justify-center">
-                      <Plane className="h-5 w-5 text-blue-500 rotate-90 mb-1" />
-                      <div className="w-full h-px bg-slate-200 relative">
-                        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-1.5 h-1.5 bg-blue-500 rounded-full"></div>
+                    {/* Center Visual */}
+                    <div className="flex-1 flex flex-col items-center justify-center px-2 relative">
+                      {/* Vector Line */}
+                      <div className="w-full h-px bg-slate-700 relative flex items-center justify-center">
+                        <div className="absolute left-0 w-1 h-1 bg-slate-600 rounded-full"></div>
+                        <div className="absolute right-0 w-1 h-1 bg-slate-600 rounded-full"></div>
+
+                        {/* Plane Icon */}
+                        <div className="bg-slate-900 px-2 z-10">
+                          <Plane className="h-5 w-5 text-blue-500 rotate-90" />
+                        </div>
+                      </div>
+
+                      {/* Flight Time Below Plane */}
+                      <div className="mt-2 text-center">
+                        <span className="text-sm font-bold text-white font-mono tracking-wide block">{formatTime(flight.flightTime)}</span>
+                        <span className="text-[8px] text-slate-500 uppercase tracking-widest block">Total Time</span>
                       </div>
                     </div>
 
-                    <div className="text-right">
-                      <span className="block text-4xl font-black text-slate-800 tracking-tighter">{flight.arrival}</span>
-                      <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider">Arrive</span>
-                    </div>
-                  </div>
-
-                  {/* Ticket Footer: Time */}
-                  <div className="bg-slate-900 px-5 py-3 flex justify-between items-center">
-                    <div className="flex items-center gap-2 text-slate-400">
-                      <Clock className="h-3 w-3" />
-                      <span className="text-[10px] uppercase tracking-wider font-bold">Total Duration</span>
-                    </div>
-                    <div className="text-blue-400 font-mono font-bold text-lg tracking-tight">
-                      {formatTime(flight.flightTime)}
+                    {/* Arrival */}
+                    <div className="text-right w-24">
+                      <span className="block text-3xl font-black text-white tracking-widest font-mono">{flight.arrival}</span>
+                      <span className="text-[9px] uppercase font-bold text-slate-500 tracking-wider mt-1 block">Arrival</span>
                     </div>
                   </div>
                 </div>
@@ -228,14 +236,14 @@ export function LogbookDashboard({ flights, onFlightClick, onAddFlight, totalHou
       </div>
 
       {/* Floating Add Button */}
-      <div className="fixed bottom-24 right-6 z-10">
+      <div className="fixed bottom-24 right-6 z-30">
         <Button
           onClick={onAddFlight}
           size="lg"
-          className="h-16 w-16 rounded-full shadow-2xl bg-blue-600 hover:bg-blue-700 active:scale-95 transition-transform"
+          className="h-14 w-14 rounded-full shadow-2xl bg-blue-600 hover:bg-blue-500 active:scale-95 transition-transform border border-blue-400/20"
           aria-label="Add new flight"
         >
-          <Plus className="h-7 w-7" />
+          <Plus className="h-6 w-6 text-white" />
         </Button>
       </div>
     </div>

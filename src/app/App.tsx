@@ -169,7 +169,7 @@ export default function App() {
   };
 
   return (
-    <div className="h-screen w-full max-w-[480px] mx-auto bg-slate-950 overflow-hidden flex flex-col relative shadow-2xl safe-area-top">
+    <div className="h-[100dvh] w-full max-w-[480px] mx-auto bg-slate-950 overflow-hidden flex flex-col relative shadow-2xl safe-area-top safe-area-bottom">
       {/* Main Content Area with Transitions */}
       <div className="flex-1 overflow-hidden relative bg-slate-900">
         <AnimatePresence initial={false} custom={direction} mode='popLayout'>
@@ -266,7 +266,9 @@ export default function App() {
 
       {/* Bottom Navigation - Hide on sub-screens */}
       {['logbook', 'stats', 'profile'].includes(currentScreen) && (
-        <BottomNavigation activeTab={activeTab} onTabChange={handleTabChange} />
+        <div className="absolute bottom-0 left-0 right-0 z-50">
+          <BottomNavigation activeTab={activeTab} onTabChange={handleTabChange} />
+        </div>
       )}
 
       <Toaster position="top-center" />

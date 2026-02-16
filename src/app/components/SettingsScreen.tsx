@@ -72,13 +72,17 @@ export function SettingsScreen({ onBack, onClearData }: SettingsScreenProps) {
                                 </div>
                                 <div className="text-xs text-blue-400 font-mono tracking-wider uppercase bg-blue-500/10 px-2 py-1 rounded border border-blue-500/20">Active</div>
                             </div>
-                            <div className="flex items-center justify-between p-4 hover:bg-slate-700/30 transition-colors cursor-not-allowed opacity-50">
+                            <div
+                                onClick={() => toast.info('Light Mode unavailable in Cockpit config')}
+                                className="flex items-center justify-between p-4 hover:bg-slate-700/30 transition-colors cursor-pointer opacity-70 group"
+                            >
                                 <div className="flex items-center gap-3">
-                                    <div className="bg-slate-900 p-2 rounded-lg text-slate-400">
+                                    <div className="bg-slate-900 p-2 rounded-lg text-slate-400 group-hover:text-slate-200 transition-colors">
                                         <Sun className="h-5 w-5" />
                                     </div>
-                                    <span className="text-slate-400 font-medium">Light Mode</span>
+                                    <span className="text-slate-400 font-medium group-hover:text-slate-300">Light Mode</span>
                                 </div>
+                                <div className="text-xs text-slate-500 font-mono tracking-wider uppercase border border-slate-700 px-2 py-1 rounded">Locked</div>
                             </div>
                         </CardContent>
                     </Card>
