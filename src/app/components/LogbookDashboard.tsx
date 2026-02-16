@@ -203,20 +203,33 @@ export function LogbookDashboard({ flights, onFlightClick, onAddFlight, totalHou
                     </div>
 
                     {/* Center Visual */}
-                    <div className="flex-1 flex flex-col items-center justify-center px-2 relative">
+                    <div className="flex-1 flex flex-col items-center justify-center px-4 relative">
                       {/* Vector Line */}
-                      <div className="w-full h-px bg-slate-200 dark:bg-slate-700 relative flex items-center justify-center transition-colors">
-                        <div className="absolute left-0 w-1 h-1 bg-slate-300 dark:bg-slate-600 rounded-full transition-colors"></div>
-                        <div className="absolute right-0 w-1 h-1 bg-slate-300 dark:bg-slate-600 rounded-full transition-colors"></div>
+                      <div className="w-full h-px bg-slate-200 dark:bg-slate-700 relative flex items-center transition-colors">
+                        <div className="absolute left-0 w-1.5 h-1.5 bg-slate-300 dark:bg-slate-600 rounded-full transition-colors"></div>
+                        <div className="absolute right-0 w-1.5 h-1.5 bg-slate-300 dark:bg-slate-600 rounded-full transition-colors"></div>
 
-                        {/* Plane Icon */}
-                        <div className="bg-white dark:bg-slate-900 px-2 z-10 transition-colors">
-                          <Plane className="h-5 w-5 text-blue-500 rotate-90" />
-                        </div>
+                        {/* Animated Plane Icon */}
+                        <motion.div
+                          className="absolute bg-white dark:bg-slate-900 px-1 z-10 transition-colors rounded-full"
+                          initial={{ left: "10%", opacity: 0 }}
+                          animate={{
+                            left: ["10%", "90%"],
+                            opacity: [0, 1, 1, 0]
+                          }}
+                          transition={{
+                            duration: 3,
+                            repeat: Infinity,
+                            ease: "easeInOut",
+                            repeatDelay: 0.5
+                          }}
+                        >
+                          <Plane className="h-5 w-5 text-blue-500 rotate-90 drop-shadow-sm" />
+                        </motion.div>
                       </div>
 
                       {/* Flight Time Below Plane */}
-                      <div className="mt-2 text-center">
+                      <div className="mt-3 text-center">
                         <span className="text-sm font-bold text-slate-800 dark:text-white font-mono tracking-wide block transition-colors">{formatTime(flight.flightTime)}</span>
                         <span className="text-[8px] text-slate-400 dark:text-slate-500 uppercase tracking-widest block transition-colors">Total Time</span>
                       </div>

@@ -65,22 +65,28 @@ export function ProfileScreen({ flights, onOpenSettings }: ProfileScreenProps) {
   };
 
   return (
-    <div className="flex flex-col h-full bg-slate-900 pb-20 relative overflow-hidden">
+    <div className="flex flex-col h-full bg-slate-50 dark:bg-slate-900 pb-20 relative overflow-hidden transition-colors duration-500">
       {/* Background Decor */}
-      <div className="absolute top-0 left-0 right-0 h-64 bg-gradient-to-b from-blue-900/20 to-transparent pointer-events-none" />
+      <div className="absolute top-0 left-0 right-0 h-64 bg-gradient-to-b from-blue-500/10 dark:from-blue-900/20 to-transparent pointer-events-none" />
 
       {/* Header */}
       <div className="px-6 pt-12 pb-8 z-10">
         <div className="flex justify-between items-start">
           <div>
-            <div className="text-[10px] text-blue-400 font-bold tracking-[0.2em] uppercase mb-1">Commander Profile</div>
-            <h1 className="text-3xl font-black tracking-tight text-white">PILOT DATA</h1>
+            <div className="text-[10px] text-blue-500 font-bold tracking-[0.2em] uppercase mb-1">Commander Profile</div>
+            <h1 className="text-3xl font-black tracking-tight text-slate-900 dark:text-white transition-colors">PILOT DATA</h1>
           </div>
           <Button
-            onClick={() => isEditing ? handleSaveProfile() : setIsEditing(true)}
+            onClick={() => {
+              if (isEditing) {
+                handleSaveProfile();
+              } else {
+                setIsEditing(true);
+              }
+            }}
             variant="outline"
             size="sm"
-            className="bg-slate-800/50 border-slate-700 text-blue-400 hover:bg-slate-700 hover:text-blue-300 transition-colors"
+            className="bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-blue-600 dark:text-blue-400 hover:bg-slate-50 dark:hover:bg-slate-700 hover:text-blue-500 dark:hover:text-blue-300 transition-colors"
           >
             {isEditing ? <Save className="h-4 w-4 mr-2" /> : <Settings className="h-4 w-4 mr-2" />}
             {isEditing ? 'SAVE' : 'EDIT'}
@@ -89,17 +95,17 @@ export function ProfileScreen({ flights, onOpenSettings }: ProfileScreenProps) {
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto px-6 space-y-6 pb-32 z-10">
+      <div className="flex-1 overflow-y-auto px-6 space-y-6 pb-40 z-10">
         {/* Profile Card */}
-        <Card className="bg-slate-800/50 backdrop-blur-md border border-slate-700 shadow-xl overflow-hidden">
+        <Card className="bg-white dark:bg-slate-800/50 backdrop-blur-md border border-slate-200 dark:border-slate-700 shadow-xl overflow-hidden transition-colors">
           <CardContent className="p-6">
             <div className="flex flex-col items-center text-center">
               <div className="relative mb-6">
                 <div className="absolute inset-0 bg-blue-500 rounded-full blur-xl opacity-20 animate-pulse"></div>
-                <div className="bg-gradient-to-br from-slate-700 to-slate-800 rounded-full p-6 border border-slate-600 relative z-10">
-                  <User className="h-12 w-12 text-blue-400" />
+                <div className="bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800 rounded-full p-6 border border-slate-200 dark:border-slate-600 relative z-10 transition-colors">
+                  <User className="h-12 w-12 text-blue-500 dark:text-blue-400" />
                 </div>
-                <div className="absolute -bottom-2 -right-2 bg-blue-600 rounded-full p-1.5 border-4 border-slate-800">
+                <div className="absolute -bottom-2 -right-2 bg-blue-600 rounded-full p-1.5 border-4 border-white dark:border-slate-800 transition-colors">
                   <ShieldCheck className="h-4 w-4 text-white" />
                 </div>
               </div>
@@ -107,35 +113,35 @@ export function ProfileScreen({ flights, onOpenSettings }: ProfileScreenProps) {
               {isEditing ? (
                 <div className="w-full space-y-4">
                   <div>
-                    <Label className="text-slate-400 text-xs uppercase tracking-wider mb-1 block text-left">Pilot Name</Label>
+                    <Label className="text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wider mb-1 block text-left transition-colors">Pilot Name</Label>
                     <Input
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      className="bg-slate-900/50 border-slate-700 text-white focus:border-blue-500 transition-all font-mono"
+                      className="bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:border-blue-500 transition-all font-mono"
                     />
                   </div>
                   <div>
-                    <Label className="text-slate-400 text-xs uppercase tracking-wider mb-1 block text-left">Rank / Title</Label>
+                    <Label className="text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wider mb-1 block text-left transition-colors">Rank / Title</Label>
                     <Input
                       value={rank}
                       onChange={(e) => setRank(e.target.value)}
-                      className="bg-slate-900/50 border-slate-700 text-white focus:border-blue-500 transition-all font-mono"
+                      className="bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:border-blue-500 transition-all font-mono"
                     />
                   </div>
                   <div>
-                    <Label className="text-slate-400 text-xs uppercase tracking-wider mb-1 block text-left">License Number</Label>
+                    <Label className="text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wider mb-1 block text-left transition-colors">License Number</Label>
                     <Input
                       value={license}
                       onChange={(e) => setLicense(e.target.value)}
-                      className="bg-slate-900/50 border-slate-700 text-white focus:border-blue-500 transition-all font-mono uppercase"
+                      className="bg-slate-50 dark:bg-slate-900/50 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:border-blue-500 transition-all font-mono uppercase"
                     />
                   </div>
                 </div>
               ) : (
                 <>
-                  <h2 className="text-2xl font-bold text-white mb-1 tracking-tight">{name}</h2>
-                  <p className="text-blue-400 text-sm font-medium tracking-wide mb-4 uppercase">{rank}</p>
-                  <div className="flex items-center gap-2 bg-slate-900/50 text-slate-300 px-4 py-2 rounded-full border border-slate-700/50">
+                  <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-1 tracking-tight transition-colors">{name}</h2>
+                  <p className="text-blue-500 dark:text-blue-400 text-sm font-medium tracking-wide mb-4 uppercase transition-colors">{rank}</p>
+                  <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-900/50 text-slate-600 dark:text-slate-300 px-4 py-2 rounded-full border border-slate-200 dark:border-slate-700/50 transition-colors">
                     <Award className="h-4 w-4 text-yellow-500" />
                     <span className="text-xs font-mono tracking-wider">{license}</span>
                   </div>
@@ -147,11 +153,11 @@ export function ProfileScreen({ flights, onOpenSettings }: ProfileScreenProps) {
 
         {/* Actions */}
         <div className="space-y-3">
-          <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest px-1">Actions</h3>
+          <h3 className="text-xs font-bold text-slate-500 dark:text-slate-500 uppercase tracking-widest px-1 transition-colors">Actions</h3>
 
           <Button
             onClick={handleExportPDF}
-            className="w-full h-14 text-base bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-900/20 active:scale-98 transition-all rounded-xl justify-between px-6"
+            className="w-full h-14 text-base bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-500/20 dark:shadow-blue-900/20 active:scale-98 transition-all rounded-xl justify-between px-6"
           >
             <span className="flex items-center gap-3">
               <FileDown className="h-5 w-5" />
@@ -162,7 +168,7 @@ export function ProfileScreen({ flights, onOpenSettings }: ProfileScreenProps) {
 
           <Button
             variant="outline"
-            className="w-full h-14 text-base bg-slate-800/50 border-slate-700 text-slate-300 hover:bg-slate-700/50 active:scale-98 transition-all rounded-xl justify-start px-6 gap-3"
+            className="w-full h-14 text-base bg-white dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700/50 active:scale-98 transition-all rounded-xl justify-start px-6 gap-3"
             onClick={onOpenSettings}
           >
             <Settings className="h-5 w-5" />
@@ -170,8 +176,8 @@ export function ProfileScreen({ flights, onOpenSettings }: ProfileScreenProps) {
           </Button>
         </div>
 
-        <div className="text-center pt-8 opacity-30">
-          <p className="text-[10px] text-slate-500 uppercase tracking-widest">Version 3.0.1 (Stable)</p>
+        <div className="text-center pt-8 opacity-30 pb-20">
+          <p className="text-[10px] text-slate-400 dark:text-slate-500 uppercase tracking-widest transition-colors">Version 4.1.0 (Stable)</p>
         </div>
       </div>
     </div>
